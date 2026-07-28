@@ -11,5 +11,10 @@ public class homePageEvents extends BaseTest{
 
     }
 
+    public void Click_on_Signup_Login_button(){
+        logger.info("Click on 'Signup / Login' button");
+        click(homePageElements.navSignupLogin);
+    }
+
 }
 

@@ -14,12 +14,12 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import base.BaseTest;
-import pageEvents.flightPageEvents;
-import pageEvents.loginPageEvents;
-import pageEvents.registerPageEvents;
+import pageEvents.homePageEvents;
+
 
 public class AutomationExercise extends BaseTest{
 	String browser;
+	homePageEvents homePage = new homePageEvents();
 	
 	
 	@BeforeTest(alwaysRun = true)
@@ -34,9 +34,17 @@ public class AutomationExercise extends BaseTest{
 		initializeBrowser(browser, testMethod);
 	}
 	
-  @Test
+  @Test (priority = 1)
   public void Test_Case_1_Register_User() {
-	 
+	 homePage.Verify_that_home_page_is_visible_successfully();
+	 homePage.Click_on_Signup_Login_button();
+	  
+  }
+
+@Test (priority = 2)
+  public void Test_Case_2_Login_User_with_correct_email_and_password() {
+	 homePage.Verify_that_home_page_is_visible_successfully();
+	 homePage.Click_on_Signup_Login_button();
 	  
   }
   

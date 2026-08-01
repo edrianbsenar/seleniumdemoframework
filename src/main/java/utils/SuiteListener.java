@@ -9,6 +9,7 @@ import org.testng.internal.annotations.IAnnotationTransformer;
 
 public class SuiteListener implements ITestListener, IAnnotationTransformer{
 	
+	@SuppressWarnings("rawtypes")
 	public void transform(ITestAnnotation annotation, Class testClass, Constructor testConstructor, Method testMethod) {
 		
 		annotation.setRetryAnalyzer(RetryAnalyzer.class);

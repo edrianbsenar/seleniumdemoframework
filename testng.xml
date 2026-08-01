@@ -4,7 +4,7 @@
 <parameter name="browser" value="${browser}"/>
   <test thread-count="5" name="Test">
     <classes>
-      <class name="regression.Register_TestCases"/>
+      <class name="regression.AutomationExerciseTestCases"/>
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->

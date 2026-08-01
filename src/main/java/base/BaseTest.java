@@ -115,6 +115,13 @@ public class BaseTest {
 				options.addArguments("--no-sandbox");
 				options.addArguments("--disable-dev-shm-usage");
 				options.addArguments("--disable-extensions");
+				options.addArguments("--disable-notifications");
+				options.addArguments("--disable-infobars");
+				options.addArguments("--disable-web-security");
+				options.addArguments("--allow-running-insecure-content");
+				options.addArguments("--ignore-certificate-errors");
+				options.addArguments("--block-new-web-contents");
+				options.addArguments("--window-position=0,0");
 				options.setCapability("acceptInsecureCerts", true);
 				WebDriverManager.chromedriver().setup();
 				driver = new ChromeDriver(options);
@@ -171,11 +178,18 @@ public class BaseTest {
 	}
 
 	public void click(String webElement) {
+		handleAdInterference();
 		try {
 			ele.getXPATHWebElement(webElement).click();
 		} catch (Exception e) {
-			WebElement element = driver.findElement(By.xpath(webElement));
-			((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+			try {
+				WebElement element = driver.findElement(By.xpath(webElement));
+				((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+			} catch (Exception e2) {
+				handleAdInterference();
+				WebElement element = driver.findElement(By.xpath(webElement));
+				((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+			}
 		}
 	}
 
@@ -188,19 +202,23 @@ public class BaseTest {
 	}
 
 	public void sendKeys(String webElement, String keysToSend) {
+		handleAdInterference();
 		ele.getXPATHWebElement(webElement).sendKeys(keysToSend);
 	}
 
 	public void sendKeysElement(WebElement element, String keysToSend) {
+		handleAdInterference();
 		element.sendKeys(keysToSend);
 	}
 
 	public void clear(String webElement) {
+		handleAdInterference();
 		ele.getXPATHWebElement(webElement).sendKeys(Keys.CONTROL, "a");
 		ele.getXPATHWebElement(webElement).sendKeys(Keys.chord(Keys.DELETE));
 	}
 
 	public void clearElement(WebElement element) {
+		handleAdInterference();
 		element.sendKeys(Keys.CONTROL, "a");
 		element.sendKeys(Keys.chord(Keys.DELETE));
 	}
@@ -325,6 +343,39 @@ public class BaseTest {
 	public void mouseHover(WebElement element) {
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", element);
 		((JavascriptExecutor) driver).executeScript("var event = new MouseEvent('mouseover', { bubbles: true, cancelable: true }); arguments[0].dispatchEvent(event);", element);
+	}
+
+	public void handleAdInterference() {
+		closePopupWindows();
+		dismissAdModals();
+	}
+
+	public void closePopupWindows() {
+		try {
+			java.util.Set<String> windowHandles = driver.getWindowHandles();
+			if (windowHandles.size() > 1) {
+				String originalHandle = driver.getWindowHandle();
+				for (String handle : windowHandles) {
+					if (!handle.equals(originalHandle)) {
+						driver.switchTo().window(handle);
+						driver.close();
+					}
+				}
+				driver.switchTo().window(originalHandle);
+			}
+		} catch (Exception e) {
+			// Ignore - no popup windows to close
+		}
+	}
+
+	public void dismissAdModals() {
+		try {
+			JavascriptExecutor js = (JavascriptExecutor) driver;
+			String removeOverlays = "var ads = document.querySelectorAll('div[id*=\"google_ads\"], div[class*=\"google_ads\"], div[id*=\"advert\"], div[class*=\"advert\"], div[class*=\"adsbygoogle\"], div[id*=\"adsbygoogle\"], iframe[src*=\"ads\"], iframe[src*=\"adservice\"], div[class*=\"ad-banner\"], div[id*=\"ad-banner\"], div[class*=\"ad-popup\"], div[id*=\"ad-popup\"], div[class*=\"popup-ad\"], div[id*=\"popup-ad\"]'); for (var i = 0; i < ads.length; i++) { ads[i].remove(); }";
+			js.executeScript(removeOverlays);
+		} catch (Exception e) {
+			// Ignore - no ad modals to dismiss
+		}
 	}
 
 }
